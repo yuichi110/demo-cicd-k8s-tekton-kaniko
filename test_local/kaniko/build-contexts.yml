@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: demo-cicd-tekton-kaniko-front-volume
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: demo-cicd-tekton-kaniko-front-storage
+  hostPath:
+    path: /Users/yuichiito/Git/demo-cicd-k8s-tekton-kaniko/front
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-cicd-tekton-kaniko-front-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: demo-cicd-tekton-kaniko-front-storage
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: demo-cicd-tekton-kaniko-back-volume
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: demo-cicd-tekton-kaniko-back-storage
+  hostPath:
+    path: /Users/yuichiito/Git/demo-cicd-k8s-tekton-kaniko/back
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: demo-cicd-tekton-kaniko-back-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: demo-cicd-tekton-kaniko-back-storage
+

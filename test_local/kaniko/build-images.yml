@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko-front
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    args: ["--context=dir:///workspace",
+           "--dockerfile=dockerfile", 
+           "--destination=iyuichivm/demo-cicd-tekton-kaniko-front:test-kaniko"]
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /kaniko/.docker
+      - name: dockerfile-storage
+        mountPath: /workspace
+  restartPolicy: Never
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: dockerhub-secrets
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+    - name: dockerfile-storage
+      persistentVolumeClaim:
+        claimName: demo-cicd-tekton-kaniko-front-claim
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko-back
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    args: ["--context=dir:///workspace",
+           "--dockerfile=dockerfile", 
+           "--destination=iyuichivm/demo-cicd-tekton-kaniko-back:test-kaniko"]
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /kaniko/.docker
+      - name: dockerfile-storage
+        mountPath: /workspace
+  restartPolicy: Never
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: dockerhub-secrets
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+    - name: dockerfile-storage
+      persistentVolumeClaim:
+        claimName: demo-cicd-tekton-kaniko-back-claim
