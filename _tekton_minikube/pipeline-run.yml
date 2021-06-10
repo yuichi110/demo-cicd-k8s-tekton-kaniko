@@ -7,9 +7,9 @@ spec:
     name: build-and-push-pipeline
   params:
     - name: gitUrl
-      value: https://github.com/FY0323/tekton-test.git
+      value: https://github.com/yuichi110/demo-cicd-k8s-tekton-kaniko.git
     - name: pathToContext
-      value: .
+      value: "back"
     - name: pathToYamlFile
       value: "k8s/back/deployment.yml"
     - name: imageUrl
