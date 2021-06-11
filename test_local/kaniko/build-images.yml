@@ -8,7 +8,7 @@ spec:
     image: gcr.io/kaniko-project/executor:latest
     args: ["--context=dir:///workspace",
            "--dockerfile=dockerfile", 
-           "--destination=iyuichivm/demo-cicd-tekton-kaniko-front:test-kaniko"]
+           "--destination=iyuichivm/demo-cicd-k8s-tekton-kaniko-front:test-kaniko"]
     volumeMounts:
       - name: kaniko-secret
         mountPath: /kaniko/.docker
@@ -38,7 +38,7 @@ spec:
     image: gcr.io/kaniko-project/executor:latest
     args: ["--context=dir:///workspace",
            "--dockerfile=dockerfile", 
-           "--destination=iyuichivm/demo-cicd-tekton-kaniko-back:test-kaniko"]
+           "--destination=iyuichivm/demo-cicd-k8s-tekton-kaniko-back:test-kaniko"]
     volumeMounts:
       - name: kaniko-secret
         mountPath: /kaniko/.docker

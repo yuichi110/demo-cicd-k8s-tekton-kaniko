@@ -1,15 +1,10 @@
 #!/bin/bash
-
+set -eu
 dir_path=$(cd $(dirname $0); pwd)
 
-DOCKERHUB_USER=iyuichivm
-BUILD_TIMESTAMP=test-kaniko
+USER=iyuichivm
+TAG=test-kaniko
 
-kubectl apply -f ../k8s/db/deployment.yml
-kubectl apply -f ../k8s/db/service.yml
-
-sed -e "s/{{DOCKERHUB_USER}}/${DOCKERHUB_USER}/g" -e "s/{{BUILD_TIMESTAMP}}/${BUILD_TIMESTAMP}/g" ../k8s/back/deployment.yml | kubectl apply -f -
-kubectl apply -f ../k8s/back/service.yml
-
-sed -e "s/{{DOCKERHUB_USER}}/${DOCKERHUB_USER}/g" -e "s/{{BUILD_TIMESTAMP}}/${BUILD_TIMESTAMP}/g" ../k8s/front/deployment.yml | kubectl apply -f -
-kubectl apply -f ../k8s/front/service.yml
+sed -e "s;__IMAGE__;redis:5.0.6-alpine3.10;g" ../../k8s/db/deployment.yml | kubectl apply -f -
+sed -e "s;__IMAGE__;${USER}/demo-cicd-k8s-tekton-kaniko-back:${TAG};g" ../../k8s/back/deployment.yml | kubectl apply -f -
+sed -e "s;__IMAGE__;${USER}/demo-cicd-k8s-tekton-kaniko-front:${TAG};g" ../../k8s/front/deployment.yml | kubectl apply -f -
