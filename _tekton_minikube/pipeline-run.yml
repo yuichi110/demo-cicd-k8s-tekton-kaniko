@@ -8,14 +8,38 @@ spec:
   params:
     - name: gitUrl
       value: https://github.com/yuichi110/demo-cicd-k8s-tekton-kaniko.git
-    - name: pathToContext
-      value: "back"
-    - name: pathToYamlFile
-      value: "k8s/back/deployment.yml"
-    - name: imageUrl
-      value: iyuichivm/demo-cicd-tekton-kaniko-back
-    - name: imageTag
+    - name: gitRevision
+      value: main
+
+    - name: frontPathToContext
+      value: "front"
+    - name: frontImageUrl
+      value: iyuichivm/demo-cicd-k8s-tekton-kaniko-front
+    - name: frontImageTag
       value: test-tekton
+
+    - name: backPathToContext
+      value: "back"
+    - name: backImageUrl
+      value: iyuichivm/demo-cicd-k8s-tekton-kaniko-back
+    - name: backImageTag
+      value: test-tekton
+
+    - name: frontPathToYamlFile
+      value: "k8s/front/deployment.yml"
+
+    - name: backPathToYamlFile
+      value: "k8s/back/deployment.yml"
+
+    - name: dbPathToYamlFile
+      value: "k8s/db/deployment.yml"
+    - name: dbImageUrl
+      value: redis
+    - name: dbImageTag
+      value: 5.0.6-alpine3.10
+    - name: dbImageDigest
+      value: 6f63d037b592
+
   serviceAccountName: pipeline-account
   workspaces:
     - name: git-source

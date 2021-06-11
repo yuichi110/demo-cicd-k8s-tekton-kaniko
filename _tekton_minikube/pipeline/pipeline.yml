@@ -12,17 +12,43 @@ spec:
     - name: gitRevision
       description: Git revision to check out
       default: master
-    - name: pathToContext
+
+    - name: frontPathToContext
       description: The path to the build context, used by Kaniko - within the workspace
       default: src
-    - name: imageUrl
+    - name: frontImageUrl
       description: Image name including repository
-    - name: imageTag
+    - name: frontImageTag
       description: Image tag
       default: "latest"
-    - name: pathToYamlFile
+
+    - name: backPathToContext
+      description: The path to the build context, used by Kaniko - within the workspace
+      default: src
+    - name: backImageUrl
+      description: Image name including repository
+    - name: backImageTag
+      description: Image tag
+      default: "latest"
+
+    - name: frontPathToYamlFile
       description: The path to the yaml file to deploy within the git source
+
+    - name: backPathToYamlFile
+      description: The path to the yaml file to deploy within the git source
+
+    - name: dbPathToYamlFile
+      description: The path to the yaml file to deploy within the git source
+    - name: dbImageUrl
+      description: Image name including repository
+    - name: dbImageTag
+      description: Image tag
+      default: "latest"
+    - name: dbImageDigest
+      description: Image Digest
+
   tasks:
+
     - name: clone-repo
       taskRef:
         name: git-clone
@@ -38,7 +64,8 @@ spec:
           value: "."
         - name: deleteExisting
           value: "true"
-    - name: source-to-image
+
+    - name: front-source-to-image
       taskRef:
         name: kaniko
       runAfter:
@@ -48,23 +75,76 @@ spec:
           workspace: git-source
       params:
         - name: CONTEXT
-          value: $(params.pathToContext)
+          value: $(params.frontPathToContext)
         - name: IMAGE
-          value: $(params.imageUrl):$(params.imageTag)
-    - name: deploy-to-cluster
+          value: $(params.frontImageUrl):$(params.frontImageTag)
+
+    - name: back-source-to-image
+      taskRef:
+        name: kaniko
+      runAfter:
+        - clone-repo
+      workspaces:
+        - name: source
+          workspace: git-source
+      params:
+        - name: CONTEXT
+          value: $(params.backPathToContext)
+        - name: IMAGE
+          value: $(params.backImageUrl):$(params.backImageTag)
+
+    - name: front-deploy-to-cluster
       taskRef:
         name: deploy-using-kubectl
       runAfter: 
-        - source-to-image
+        - front-source-to-image
+        - back-deploy-to-cluster
       workspaces:
         - name: git-source
           workspace: git-source
       params:
         - name: pathToYamlFile
-          value: $(params.pathToYamlFile)
+          value: $(params.frontPathToYamlFile)
         - name: imageUrl
-          value: $(params.imageUrl)
+          value: $(params.frontImageUrl)
         - name: imageTag
-          value: $(params.imageTag)
+          value: $(params.frontImageTag)
         - name: imageDigest
-          value: $(tasks.source-to-image.results.IMAGE-DIGEST)
+          value: $(tasks.front-source-to-image.results.IMAGE-DIGEST)
+
+    - name: back-deploy-to-cluster
+      taskRef:
+        name: deploy-using-kubectl
+      runAfter: 
+        - back-source-to-image
+        - db-deploy-to-cluster
+      workspaces:
+        - name: git-source
+          workspace: git-source
+      params:
+        - name: pathToYamlFile
+          value: $(params.backPathToYamlFile)
+        - name: imageUrl
+          value: $(params.backImageUrl)
+        - name: imageTag
+          value: $(params.backImageTag)
+        - name: imageDigest
+          value: $(tasks.back-source-to-image.results.IMAGE-DIGEST)
+
+    - name: db-deploy-to-cluster
+      taskRef:
+        name: deploy-using-kubectl
+      runAfter: 
+        - clone-repo
+      workspaces:
+        - name: git-source
+          workspace: git-source
+      params:
+        - name: pathToYamlFile
+          value: $(params.dbPathToYamlFile)
+        - name: imageUrl
+          value: $(params.dbImageUrl)
+        - name: imageTag
+          value: $(params.dbImageTag)
+        - name: imageDigest
+          value: $(params.dbImageDigest)
