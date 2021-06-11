@@ -54,9 +54,9 @@
         daemon_reload: yes
         enabled: yes
 
-    - name: Download minikube
-      get_url:
-        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    - name: Copy minikube
+      copy:
+        src: ./minikube-linux-1.20.0-amd64
         dest: /usr/local/bin/minikube
         mode: 0111
 
@@ -72,3 +72,15 @@
         dest: /root/export_kubeconfig.sh
         mode: 0755
         
+    # TEKTON
+
+    - name: Copy tkn
+      copy:
+        src: ./tkn_0.19.0_Linux_arm64/tkn
+        dest: /usr/local/bin/tkn
+        mode: 0111 
+
+    - name: Copy tekton files
+      copy:
+        src: ./tekton
+        dest: /root
