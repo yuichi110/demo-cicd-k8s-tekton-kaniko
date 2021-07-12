@@ -1,5 +1,8 @@
 - hosts: all
-  remote_user: root
+  remote_user: ubuntu
+  become: true
+  become_user: root
+  become_method: sudo
   tasks:
 
     - name: Make .ssh
@@ -15,7 +18,14 @@
     - name: Generate ssh key if not exist
       shell: ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
       when: not ssh_key.stat.exists
-      
+
+    - name: Copy authorized_keys
+      copy:
+        remote_src: True
+        src: /home/ubuntu/.ssh/authorized_keys
+        dest: /root/.ssh/authorized_keys
+        mode: 0600
+            
     - name: Add k8s apt key
       apt_key:
         url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
